@@ -1,31 +1,14 @@
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-from tkinter import (DoubleVar, Entry, Frame, Label, LEFT, OptionMenu,
+from tkinter import (Button, DoubleVar, Entry, Frame, Label, LEFT, OptionMenu,
                      StringVar, Tk)
-
 from zernike_terms import ZERNIKE_TERM_NAMES
 
 
-def handle_zernike_value_changes(zernike_term, term_val, fig):
-    print(zernike_term, term_val)
-    fig.clf()
-    plot1 = fig.add_subplot(111)
-    y = [(i + term_val)**2 for i in range(101)]
-    # plotting the graph
-    plot1.plot(y)
-    fig.canvas.draw()
-
-
-def display_gui(handle_zernike_value_changes):
-    # The main window
+def display_gui(fig, update_zernike_amp):
     window = Tk()
-    window.title('Zernike Polynomials')
+    window.title('Zernike Visualization')
 
-    # the figure that will contain the plot
-    fig = plt.Figure(figsize=(5, 5), dpi=100)
-    # adding the subplot
-    # specify the window as root
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas.draw()
     canvas.get_tk_widget().grid(row=1,
@@ -45,23 +28,17 @@ def display_gui(handle_zernike_value_changes):
                                                               columnspan=4,
                                                               pady=10)
     zernike_inputs = []
-    for term in range(1, 13):
-        Label(window, text=f'Z{term}', justify=LEFT).grid(row=term,
-                                                          column=1,
+    for term in range(1, 25):
+        term_row = term - 12 if term > 12 else term
+        column = 3 if term > 12 else 1
+        Label(window, text=f'Z{term}', justify=LEFT).grid(row=term_row,
+                                                          column=column,
                                                           padx=10)
         entry_text = DoubleVar()
-        Entry(window, width=10, textvariable=entry_text).grid(row=term,
-                                                              column=2,
-                                                              padx=5)
-        zernike_inputs.append(entry_text)
-    for term in range(1, 13):
-        Label(window, text=f'Z{term + 12}', justify=LEFT).grid(row=term,
-                                                               column=3,
-                                                               padx=10)
-        entry_text = DoubleVar()
-        Entry(window, width=10, textvariable=entry_text).grid(row=term,
-                                                              column=4,
-                                                              padx=5)
+        Entry(window, width=10,
+              textvariable=entry_text).grid(row=term_row,
+                                            column=column + 1,
+                                            padx=5)
         zernike_inputs.append(entry_text)
 
     def my_callback_curry(zernike_term, input_var):
@@ -71,7 +48,7 @@ def display_gui(handle_zernike_value_changes):
                 term_val = input_var.get()
             except Exception:
                 term_val = 0.0
-            handle_zernike_value_changes(zernike_term, term_val, fig)
+            update_zernike_amp(zernike_term, term_val)
 
         return curried
 
@@ -86,28 +63,36 @@ def display_gui(handle_zernike_value_changes):
                                                            padx=10,
                                                            sticky='N')
 
-    Label(window, text='Plot Type', justify=LEFT).grid(row=15,
-                                                       column=1,
-                                                       columnspan=2,
-                                                       padx=10,
-                                                       sticky='W')
-    OPTIONS = ['a', 'b', 'c']
-    var1 = StringVar(window)
-    var1.set(OPTIONS[1])
-    OptionMenu(window, var1, *OPTIONS).grid(row=16,
-                                            column=1,
-                                            columnspan=4,
-                                            padx=10,
-                                            sticky='W')
+    def reset_terms():
+        update_zernike_amp('all', 0.0)
+        for zernike_input in zernike_inputs:
+            zernike_input.set(0.0)
 
-    def update_plot():
-        # list of squares
-        y = [i**2 for i in range(101)]
-        # plotting the graph
-        plot1.plot(y)
-        fig.canvas.draw()
+    Button(window, text='Reset Terms', command=reset_terms).grid(row=14,
+                                                                 column=1,
+                                                                 columnspan=2,
+                                                                 padx=10,
+                                                                 sticky='W')
+
+    Label(window, text='Plot Type:', justify=LEFT).grid(row=15,
+                                                        column=1,
+                                                        columnspan=2,
+                                                        padx=10,
+                                                        sticky='W')
+    OPTIONS = ['a', 'b', 'c']
+    plot_type = StringVar(window)
+
+    def plot_type_change(new_plot):
+        print(new_plot)
+
+    OptionMenu(window, plot_type, *OPTIONS,
+               command=plot_type_change).grid(row=16,
+                                              column=1,
+                                              columnspan=4,
+                                              padx=10,
+                                              sticky='W')
+
+    plot_type.set(OPTIONS[0])
+    zernike_inputs[0].set(1.0)
 
     window.mainloop()
-
-
-display_gui(handle_zernike_value_changes)

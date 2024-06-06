@@ -1,3 +1,6 @@
+# Inclusive range of Zernike Noll terms
+ZERNIKE_TERM_RANGE = (1, 24)
+
 # Dictionary of { noll_term: (n [radial index], m [azimuthal index]) }
 ZERNIKE_NOLL_LOOKUP = {
     1: (0, 0),
