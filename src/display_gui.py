@@ -1,9 +1,8 @@
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-from plots import get_plots
 from tkinter import (Button, DoubleVar, Entry, Frame, Label, LEFT, OptionMenu,
                      StringVar, Tk)
-from zernike_terms import ZERNIKE_TERM_NAMES
+from zernike_terms import ZERNIKE_TERM_NAMES, ZERNIKE_TERM_RANGE
 
 
 # https://stackoverflow.com/a/15549675
@@ -14,17 +13,14 @@ class NavigationToolbar(NavigationToolbar2Tk):
     ]
 
 
-def display_gui(fig, update_zernike_amp, update_plot_func):
+def display_gui(fig, update_zernike_amp, update_plot_func, plot_names):
     window = Tk()
     window.title('Zernike Visualization')
 
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas.draw()
-    canvas.get_tk_widget().grid(row=0,
-                                column=0,
-                                ipadx=40,
-                                ipady=20,
-                                rowspan=17)
+    tk_canvas = canvas.get_tk_widget()
+    tk_canvas.grid(row=0, column=0, ipadx=20, ipady=20, rowspan=17)
     toolbar_frame = Frame(master=window)
     toolbar_frame.grid(row=16, column=0)
     NavigationToolbar(canvas, toolbar_frame)
@@ -35,7 +31,7 @@ def display_gui(fig, update_zernike_amp, update_plot_func):
                                                               columnspan=4,
                                                               pady=10)
     zernike_inputs = []
-    for term in range(1, 25):
+    for term in range(*ZERNIKE_TERM_RANGE):
         term_row = term - 12 if term > 12 else term
         column = 3 if term > 12 else 1
         Label(window, text=f'Z{term}', justify=LEFT).grid(row=term_row,
@@ -86,17 +82,9 @@ def display_gui(fig, update_zernike_amp, update_plot_func):
                                                         columnspan=2,
                                                         padx=10,
                                                         sticky='W')
-    plots_arr = get_plots()
-    plot_names = [name for name, func in plots_arr]
-    plot_type = StringVar(window)
-
-    def plot_type_change(new_plot):
-        for name, func in plots_arr:
-            if name == new_plot:
-                update_plot_func(func)
-
+    plot_type = StringVar()
     OptionMenu(window, plot_type, *plot_names,
-               command=plot_type_change).grid(row=16,
+               command=update_plot_func).grid(row=16,
                                               column=1,
                                               columnspan=4,
                                               padx=10,
