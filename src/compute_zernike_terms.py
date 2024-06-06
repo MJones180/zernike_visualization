@@ -42,3 +42,44 @@ def compute_zernike_dict(rho_grid, theta_grid):
         noll_term: _compute_zernike_term(n, m, rho_grid, theta_grid)
         for noll_term, (n, m) in ZERNIKE_NOLL_LOOKUP.items()
     }
+
+
+def compute_zernike_dict_fixed(rho_grid, theta_grid):
+    # The `compute_zernike_dict` was not working for spherical aberrations, so
+    # below are the questions being computed directly. Equations taken from:
+    # webs.optics.arizona.edu/gsmith/Zernike.html
+    rho = rho_grid
+    theta = theta_grid
+    sin = np.sin
+    cos = np.cos
+    rho2 = rho**2
+    rho3 = rho**3
+    rho4 = rho**4
+    theta2 = theta * 2
+    theta3 = theta * 3
+    return {
+        1: 1,
+        2: 2 * rho * cos(theta),
+        3: 2 * rho * sin(theta),
+        4: 3**0.5 * (2 * rho2 - 1),
+        5: 6**0.5 * rho2 * sin(theta2),
+        6: 6**0.5 * rho2 * cos(theta2),
+        7: 8**0.5 * rho * (3 * rho2 - 2) * sin(theta),
+        8: 8**0.5 * rho * (3 * rho2 - 2) * cos(theta),
+        9: 8**0.5 * rho3 * sin(theta3),
+        10: 8**0.5 * rho3 * cos(theta3),
+        11: 5**0.5 * (6 * rho4 - 6 * rho2 + 1),
+        12: 10**0.5 * rho2 * (4 * rho2 - 3) * cos(theta2),
+        13: 10**0.5 * rho2 * (4 * rho2 - 3) * sin(theta2),
+        14: 10**0.5 * rho4 * cos(4 * theta),
+        15: 10**0.5 * rho4 * sin(4 * theta),
+        16: 12**0.5 * rho * (10 * rho4 - 12 * rho2 + 3) * cos(theta),
+        17: 12**0.5 * rho * (10 * rho4 - 12 * rho2 + 3) * sin(theta),
+        18: 12**0.5 * rho3 * (5 * rho2 - 4) * cos(theta3),
+        19: 12**0.5 * rho3 * (5 * rho2 - 4) * sin(theta3),
+        20: 12**0.5 * rho**5 * cos(5 * theta),
+        21: 12**0.5 * rho**5 * sin(5 * theta),
+        22: 7**0.5 * (20 * rho**6 - 30 * rho4 + 12 * rho2 - 1),
+        23: 14**0.5 * rho2 * (15 * rho4 - 20 * rho2 + 6) * sin(theta2),
+        24: 14**0.5 * rho2 * (15 * rho4 - 20 * rho2 + 6) * cos(theta2),
+    }

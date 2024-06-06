@@ -1,4 +1,4 @@
-from compute_zernike_terms import compute_zernike_dict
+from compute_zernike_terms import compute_zernike_dict_fixed
 from display_gui import display_gui
 import numpy as np
 from plots import get_fig_object, get_plots
@@ -13,7 +13,7 @@ def main():
     rho_points = np.linspace(1e-6, 1, GRID_R_POINTS)
     theta_points = np.linspace(0, 2 * np.pi, GRID_THETA_POINTS)
     rho_grid, theta_grid = np.meshgrid(rho_points, theta_points)
-    aberrations = compute_zernike_dict(rho_grid, theta_grid)
+    aberrations = compute_zernike_dict_fixed(rho_grid, theta_grid)
 
     x_grid = rho_grid * np.cos(theta_grid)
     y_grid = rho_grid * np.sin(theta_grid)
