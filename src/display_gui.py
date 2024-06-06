@@ -1,27 +1,34 @@
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
+from plots import get_plots
 from tkinter import (Button, DoubleVar, Entry, Frame, Label, LEFT, OptionMenu,
                      StringVar, Tk)
 from zernike_terms import ZERNIKE_TERM_NAMES
 
 
-def display_gui(fig, update_zernike_amp):
+# https://stackoverflow.com/a/15549675
+class NavigationToolbar(NavigationToolbar2Tk):
+    toolitems = [
+        t for t in NavigationToolbar2Tk.toolitems
+        if t[0] in ('Home', 'Pan', 'Zoom', 'Save')
+    ]
+
+
+def display_gui(fig, update_zernike_amp, update_plot_func):
     window = Tk()
     window.title('Zernike Visualization')
 
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas.draw()
-    canvas.get_tk_widget().grid(row=1,
+    canvas.get_tk_widget().grid(row=0,
                                 column=0,
                                 ipadx=40,
                                 ipady=20,
-                                rowspan=16)
-    # navigation toolbar
-    toolbarFrame = Frame(master=window)
-    toolbarFrame.grid(row=17, column=0)
-    NavigationToolbar2Tk(canvas, toolbarFrame)
+                                rowspan=17)
+    toolbar_frame = Frame(master=window)
+    toolbar_frame.grid(row=16, column=0)
+    NavigationToolbar(canvas, toolbar_frame)
 
-    Label(window, text='<Plot Type>').grid(row=0, column=0, pady=10)
     Label(window,
           text='Noll Zernike Term Amplitude (Unitless)').grid(row=0,
                                                               column=1,
@@ -79,20 +86,23 @@ def display_gui(fig, update_zernike_amp):
                                                         columnspan=2,
                                                         padx=10,
                                                         sticky='W')
-    OPTIONS = ['a', 'b', 'c']
+    plots_arr = get_plots()
+    plot_names = [name for name, func in plots_arr]
     plot_type = StringVar(window)
 
     def plot_type_change(new_plot):
-        print(new_plot)
+        for name, func in plots_arr:
+            if name == new_plot:
+                update_plot_func(func)
 
-    OptionMenu(window, plot_type, *OPTIONS,
+    OptionMenu(window, plot_type, *plot_names,
                command=plot_type_change).grid(row=16,
                                               column=1,
                                               columnspan=4,
                                               padx=10,
                                               sticky='W')
 
-    plot_type.set(OPTIONS[0])
+    plot_type.set(plot_names[0])
     zernike_inputs[0].set(1.0)
 
     window.mainloop()

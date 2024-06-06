@@ -17,8 +17,6 @@ def main():
     rho_grid, theta_grid = np.meshgrid(rho_points, theta_points)
     aberrations = compute_zernike_dict(rho_grid, theta_grid)
 
-    plots = get_plots()
-
     x_grid = rho_grid * np.cos(theta_grid)
     y_grid = rho_grid * np.sin(theta_grid)
     aberration_field = np.zeros_like(x_grid)
@@ -38,25 +36,18 @@ def main():
                 field += amp * aberrations[term]
         return field
 
+    current_plot_func = get_plots()[0][1]
+
+    def update_plot_func(plot_func):
+        nonlocal current_plot_func
+        current_plot_func = plot_func
+        _update_plot()
+
     def _update_plot():
-        print('Updating')
         aberration_field = _get_aberration_field()
         fig.clf()
-        plot = fig.add_subplot(111)
-        plot.scatter(x_grid, y_grid, c=aberration_field)
+        current_plot_func(fig, x_grid, y_grid, aberration_field)
         fig.canvas.draw()
-
-        # ax = plt.subplot(111)
-        # ax.scatter(x_grid, y_grid, c=aberrations)
-        # ax.set_aspect(1)
-        # plt.show()
-        # fig.clf()
-        # plot1 = fig.add_subplot(111)
-        # y = [(i + term_val)**2 for i in range(101)]
-        # # plotting the graph
-        # plot1.plot(y)
-        # fig.canvas.draw()
-        # pass
 
     def update_zernike_amp(zernike_term, term_val):
         if zernike_term == 'all':
@@ -67,7 +58,7 @@ def main():
             zernike_amps[zernike_term] = term_val
             _update_plot()
 
-    display_gui(fig, update_zernike_amp)
+    display_gui(fig, update_zernike_amp, update_plot_func)
 
 
 if __name__ == '__main__':
