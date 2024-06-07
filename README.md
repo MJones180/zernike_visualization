@@ -18,7 +18,7 @@ If the dependencies change at any point, the `environment.yml` can be updated vi
 
     conda env export --no-builds | grep -v "^prefix: " > environment.yml
 
-## Running Script
+## Running GUI
 
 Navigate to the `src` folder and run `python3 main.py`.
 This will open an interactive GUI.
