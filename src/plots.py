@@ -20,10 +20,10 @@ def scatter_3D(fig, x_grid, y_grid, aberration_field):
 
 
 def get_plots():
-    return [
-        ('Scatter (2D)', scatter_2D),
-        ('Scatter (3D)', scatter_3D),
-    ]
+    return {
+        'Scatter (2D)': scatter_2D,
+        'Scatter (3D)': scatter_3D,
+    }
 
 
 def get_fig_object():
