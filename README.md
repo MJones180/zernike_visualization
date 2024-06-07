@@ -29,3 +29,9 @@ The Zernike terms are represented using Noll Indices.
 More information can be found at the link below.
 
 https://en.wikipedia.org/wiki/Zernike_polynomials#Noll's_sequential_indices
+
+## Note on Precision
+
+To improve performance, only incremental updates are made to the plots.
+Due to this, sometimes precision errors occur.
+When this happens, simply click the `Reset Terms` button.

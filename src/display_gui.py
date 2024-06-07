@@ -67,7 +67,7 @@ def display_gui(fig, update_zernike_amp, update_plot_func, plot_names):
                                                            sticky='N')
 
     def reset_terms():
-        update_zernike_amp('all', 0.0)
+        update_zernike_amp('all_zero')
         for zernike_input in zernike_inputs:
             zernike_input.set(0.0)
 

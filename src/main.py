@@ -22,15 +22,8 @@ def main():
     y_grid = rho_grid * np.sin(theta_grid)
     # Current amplitudes for each of the Zernike terms
     zernike_amps = {term: 0 for term in range(*ZERNIKE_TERM_RANGE)}
-
-    def _get_aberration_field():
-        # The field representing the sum of all the aberrations
-        field = np.zeros_like(x_grid)
-        for term, amp in zernike_amps.items():
-            if amp != 0:
-                field += amp * aberrations[term]
-        return field
-
+    # The field representing the sum of all the aberrations
+    aberration_field = np.zeros_like(x_grid)
     # Dict with the available plots as { title: plotting_function, ... }
     plots_listing = get_plots()
     # All plot names, this will be displayed on the GUI
@@ -41,8 +34,6 @@ def main():
     fig = get_fig_object()
 
     def _update_plot():
-        # Get the current aberration field
-        aberration_field = _get_aberration_field()
         # Clear the current figure
         fig.clf()
         # Plot the new data on
@@ -56,12 +47,21 @@ def main():
         plotting_func = plots_listing[plot_name]
         _update_plot()
 
-    def update_zernike_amp(zernike_term, term_val):
-        if zernike_term == 'all':
+    def update_zernike_amp(zernike_term, term_val=0):
+        nonlocal aberration_field
+        # Reset all the zernike terms and field
+        if zernike_term == 'all_zero':
+            aberration_field[:, :] = 0
             for term in zernike_amps.keys():
                 zernike_amps[term] = 0
             _update_plot()
+        # Since this function gets called for any input change (for instance,
+        # adding more zeros), only update if the term's value actually changed
         elif zernike_amps[zernike_term] != term_val:
+            # Compute only the difference in how much this term has changed
+            term_diff = term_val - zernike_amps[zernike_term]
+            # Make the incremental change to the field
+            aberration_field += term_diff * aberrations[zernike_term]
             zernike_amps[zernike_term] = term_val
             _update_plot()
 
