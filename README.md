@@ -23,6 +23,10 @@ If the dependencies change at any point, the `environment.yml` can be updated vi
 Navigate to the `src` folder and run `python3 main.py`.
 This will open an interactive GUI.
 
+Currently supports 2D and 3D plots:
+![Example 2D Plot](./example_2D.png)
+![Example 3D Plot](./example_3D.png)
+
 ## Noll Zernike Indices
 
 The Zernike terms are represented using Noll Indices.
