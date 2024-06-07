@@ -8,11 +8,11 @@ This is a tool to visualize Zernike Polynomial combinations (up through the firs
 
 The following Conda command will create the environment and install the necessary dependencies:
 
-    conda env create -f environment.yml 
+    conda env create -f environment.yml
 
 Then, to activate the environment:
 
-    conda activate zernike_env
+    conda activate zernike
 
 If the dependencies change at any point, the `environment.yml` can be updated via:
 
