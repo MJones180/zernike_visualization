@@ -21,7 +21,13 @@ class NavigationToolbar(NavigationToolbar2Tk):
 # This just creates a temporary reference to the element so that it can be put
 # on the grid. This could be done in one line, but then the lines get too long.
 # Additionally, the GUI has been hardcoded to handle 24 Zernike terms.
-def display_gui(update_zernike_amp, update_plot_func, plot_names):
+def display_gui(
+    update_zernike_amp,
+    update_cmap,
+    cmap_names,
+    update_plot_func,
+    plot_names,
+):
     # ================
     # Init the GUI
     # ================
@@ -35,14 +41,14 @@ def display_gui(update_zernike_amp, update_plot_func, plot_names):
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas.draw()
     v = canvas.get_tk_widget()
-    v.grid(row=0, rowspan=17, column=0, ipadx=20, ipady=20)
+    v.grid(row=0, rowspan=18, column=0, ipadx=20, ipady=20)
 
     # ============================
     # Display the Plotting Toolbar
     # ============================
 
     toolbar_frame = Frame(master=window)
-    toolbar_frame.grid(row=16, column=0, padx=10, pady=10, sticky='W')
+    toolbar_frame.grid(row=17, column=0, padx=10, pady=10, sticky='W')
     NavigationToolbar(canvas, toolbar_frame)
 
     # =======================
@@ -102,6 +108,19 @@ def display_gui(update_zernike_amp, update_plot_func, plot_names):
     v = Button(window, text='Reset Terms', command=reset_terms)
     v.grid(row=14, column=1, columnspan=6, padx=10, sticky='WE')
 
+    # ===============
+    # Change Colormap
+    # ===============
+
+    # Label to change the plot type
+    v = Label(window, text='Colormap:', justify=LEFT)
+    v.grid(row=15, column=1, columnspan=2, padx=10, sticky='W')
+
+    # Option menu to change the plot type
+    cmap_name = StringVar()
+    v = OptionMenu(window, cmap_name, *cmap_names, command=update_cmap)
+    v.grid(row=15, column=3, columnspan=4, padx=10, sticky='WE')
+
     # ================
     # Change Plot Type
     # ================
@@ -119,8 +138,9 @@ def display_gui(update_zernike_amp, update_plot_func, plot_names):
     # Default values
     # ==============
 
-    # The default plot type
+    # The default plot type and cmap
     plot_type.set(plot_names[0])
+    cmap_name.set(cmap_names[0])
     # Update the first term and revert it to display the initial plot
     update_zernike_amp(1, 1)
     update_zernike_amp(1, 0)

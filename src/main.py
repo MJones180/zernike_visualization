@@ -1,7 +1,7 @@
 from compute_zernike_terms import compute_zernike_dict_fixed
 from display_gui import display_gui
 import numpy as np
-from plots import fig, get_plots
+from plots import fig, get_cmap_options, get_plots
 from zernike_terms import ZERNIKE_TERM_RANGE
 
 # Number of grid points
@@ -26,18 +26,28 @@ def main():
     aberration_field = np.zeros_like(x_grid)
     # Dict with the available plots as { title: plotting_function, ... }
     plots_listing = get_plots()
-    # All plot names, this will be displayed on the GUI
+    # All plot names
     plot_names = list(plots_listing.keys())
     # Default to the first plotting function
     plotting_func = plots_listing[plot_names[0]]
+    # All colormap names
+    cmap_names = get_cmap_options()
+    # Default to the first cmap listed
+    current_cmap = cmap_names[0]
 
     def _update_plot():
         # Clear the current figure
         fig.clf()
         # Plot the new data on
-        plotting_func(x_grid, y_grid, aberration_field)
+        plotting_func(x_grid, y_grid, aberration_field, current_cmap)
         # Update on the GUI
         fig.canvas.draw()
+
+    def change_cmap(cmap_name):
+        nonlocal current_cmap
+        # Switch to the new cmap
+        current_cmap = cmap_name
+        _update_plot()
 
     def change_plot_type(plot_name):
         nonlocal plotting_func
@@ -63,7 +73,13 @@ def main():
             zernike_amps[zernike_term] = term_val
             _update_plot()
 
-    display_gui(update_zernike_amp, change_plot_type, plot_names)
+    display_gui(
+        update_zernike_amp,
+        change_cmap,
+        cmap_names,
+        change_plot_type,
+        plot_names,
+    )
 
 
 if __name__ == '__main__':
