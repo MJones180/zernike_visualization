@@ -4,7 +4,7 @@ from zernike_terms import ZERNIKE_NOLL_LOOKUP
 
 def compute_zernike_dict_fixed(rho_grid, theta_grid):
     # The `compute_zernike_dict` was not working for spherical aberrations, so
-    # below are the questions being computed directly. Equations taken from:
+    # below are the equations being computed directly. Equations taken from:
     # webs.optics.arizona.edu/gsmith/Zernike.html
     rho = rho_grid
     theta = theta_grid

@@ -1,7 +1,7 @@
 from compute_zernike_terms import compute_zernike_dict_fixed
 from display_gui import display_gui
 import numpy as np
-from plots import get_fig_object, get_plots
+from plots import fig, get_plots
 from zernike_terms import ZERNIKE_TERM_RANGE
 
 # Number of grid points
@@ -30,14 +30,12 @@ def main():
     plot_names = list(plots_listing.keys())
     # Default to the first plotting function
     plotting_func = plots_listing[plot_names[0]]
-    # The figure object that all plots will output using
-    fig = get_fig_object()
 
     def _update_plot():
         # Clear the current figure
         fig.clf()
         # Plot the new data on
-        plotting_func(fig, x_grid, y_grid, aberration_field)
+        plotting_func(x_grid, y_grid, aberration_field)
         # Update on the GUI
         fig.canvas.draw()
 
