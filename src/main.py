@@ -41,13 +41,18 @@ def main():
     fig = get_fig_object()
 
     def _update_plot():
+        # Get the current aberration field
         aberration_field = _get_aberration_field()
+        # Clear the current figure
         fig.clf()
+        # Plot the new data on
         plotting_func(fig, x_grid, y_grid, aberration_field)
+        # Update on the GUI
         fig.canvas.draw()
 
     def change_plot_type(plot_name):
         nonlocal plotting_func
+        # Switch to the new plotter
         plotting_func = plots_listing[plot_name]
         _update_plot()
 

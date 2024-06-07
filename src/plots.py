@@ -26,5 +26,8 @@ def get_plots():
     }
 
 
+fig = plt.Figure(figsize=(5, 5), dpi=100)
+
+
 def get_fig_object():
-    return plt.Figure(figsize=(5, 5), dpi=100)
+    return fig
