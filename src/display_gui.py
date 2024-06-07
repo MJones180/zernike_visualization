@@ -1,10 +1,12 @@
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
+from plots import fig
 from tkinter import (Button, DoubleVar, Entry, Frame, Label, LEFT, OptionMenu,
-                     StringVar, Tk)
+                     RIGHT, StringVar, Tk)
 from zernike_terms import ZERNIKE_TERM_NAMES, ZERNIKE_TERM_RANGE
 
 
+# Remove some of the useless buttons
 # https://stackoverflow.com/a/15549675
 class NavigationToolbar(NavigationToolbar2Tk):
     toolitems = [
@@ -13,38 +15,62 @@ class NavigationToolbar(NavigationToolbar2Tk):
     ]
 
 
-def display_gui(fig, update_zernike_amp, update_plot_func, plot_names):
+# A common syntax throughout is the following two lines:
+#   v = <Element>()
+#   v.grid
+# This just creates a temporary reference to the element so that it can be put
+# on the grid. This could be done in one line, but then the lines get too long.
+def display_gui(update_zernike_amp, update_plot_func, plot_names):
+    # ================
+    # Init the GUI
+    # ================
     window = Tk()
     window.title('Zernike Visualization')
 
+    # ================
+    # Display the Plot
+    # ================
+
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas.draw()
-    tk_canvas = canvas.get_tk_widget()
-    tk_canvas.grid(row=0, column=0, ipadx=20, ipady=20, rowspan=17)
+    v = canvas.get_tk_widget()
+    v.grid(row=0, rowspan=17, column=0, ipadx=20, ipady=20)
+
+    # ============================
+    # Display the Plotting Toolbar
+    # ============================
+
     toolbar_frame = Frame(master=window)
-    toolbar_frame.grid(row=16, column=0)
+    toolbar_frame.grid(row=16, column=0, padx=10, pady=10, sticky='W')
     NavigationToolbar(canvas, toolbar_frame)
 
-    Label(window,
-          text='Noll Zernike Term Amplitude (Unitless)').grid(row=0,
-                                                              column=1,
-                                                              columnspan=4,
-                                                              pady=10)
+    # =======================
+    # Display the Input Boxes
+    # =======================
+
+    # Label that sits above all the inputs boxes
+    v = Label(window, text='Noll Zernike Term Amplitude (Unitless)')
+    v.grid(row=0, column=1, columnspan=6, pady=10)
+
     zernike_inputs = []
     for term in range(*ZERNIKE_TERM_RANGE):
         term_row = term - 12 if term > 12 else term
-        column = 3 if term > 12 else 1
-        Label(window, text=f'Z{term}', justify=LEFT).grid(row=term_row,
-                                                          column=column,
-                                                          padx=10)
+        column = 4 if term > 12 else 1
+        v = Label(window, text=f'{ZERNIKE_TERM_NAMES[term]}', justify=RIGHT)
+        v.grid(row=term_row, column=column, padx=(10, 0), sticky='E')
+        v = Label(window, text=f'Z{term}', justify=RIGHT)
+        v.grid(row=term_row, column=column + 1, sticky='E')
         entry_text = DoubleVar()
-        Entry(window, width=10,
-              textvariable=entry_text).grid(row=term_row,
-                                            column=column + 1,
-                                            padx=5)
+        v = Entry(window, width=8, textvariable=entry_text)
+        v.grid(row=term_row, column=column + 2, padx=10)
         zernike_inputs.append(entry_text)
 
-    def my_callback_curry(zernike_term, input_var):
+    # ==============================
+    # Track and Update Input Changes
+    # ==============================
+
+    # Wrapper to pass the input being changed in
+    def input_change_wrapper(zernike_term, input_var):
 
         def curried(*args):
             try:
@@ -55,42 +81,51 @@ def display_gui(fig, update_zernike_amp, update_plot_func, plot_names):
 
         return curried
 
-    for term_idx, zernike_input in enumerate(zernike_inputs):
-        zernike_input.trace_add('write',
-                                my_callback_curry(term_idx + 1, zernike_input))
+    # Track the changes to each of the inputs
+    for term_idx, zernike_input in enumerate(zernike_inputs, 1):
+        zernike_input.trace_add(
+            'write',
+            input_change_wrapper(term_idx, zernike_input),
+        )
 
-    strs = [f'Z{term}: {name}' for term, name in ZERNIKE_TERM_NAMES.items()]
-    Label(window, text='\n'.join(strs), justify=LEFT).grid(row=1,
-                                                           column=5,
-                                                           rowspan=13,
-                                                           padx=10,
-                                                           sticky='N')
+    # ===========
+    # Reset Terms
+    # ===========
 
     def reset_terms():
         update_zernike_amp('all_zero')
         for zernike_input in zernike_inputs:
             zernike_input.set(0.0)
 
-    Button(window, text='Reset Terms', command=reset_terms).grid(row=14,
-                                                                 column=1,
-                                                                 columnspan=2,
-                                                                 padx=10,
-                                                                 sticky='W')
+    # Button to reset the Zernike terms and plot
+    v = Button(window, text='Reset Terms', command=reset_terms)
+    v.grid(row=14, column=1, columnspan=6, padx=10, sticky='WE')
 
-    Label(window, text='Plot Type:', justify=LEFT).grid(row=15,
-                                                        column=1,
-                                                        columnspan=2,
-                                                        padx=10,
-                                                        sticky='W')
+    # ================
+    # Change Plot Type
+    # ================
+
+    # Label to change the plot type
+    v = Label(window, text='Plot Type:', justify=LEFT)
+    v.grid(row=15, column=1, columnspan=2, padx=10, sticky='W')
+
+    # Option menu to change the plot type
     plot_type = StringVar()
-    OptionMenu(window, plot_type, *plot_names,
-               command=update_plot_func).grid(row=16,
-                                              column=1,
-                                              columnspan=4,
-                                              padx=10,
-                                              sticky='W')
+    v = OptionMenu(window, plot_type, *plot_names, command=update_plot_func)
+    v.grid(row=16, column=1, columnspan=4, padx=10, sticky='W')
 
+    # ==============
+    # Default values
+    # ==============
+
+    # The default plot type
     plot_type.set(plot_names[0])
-    zernike_inputs[0].set(1.0)
+    # Update the first term and revert it to display the initial plot
+    update_zernike_amp(1, 1)
+    update_zernike_amp(1, 0)
+
+    # ===========
+    # Display GUI
+    # ===========
 
     window.mainloop()

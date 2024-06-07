@@ -63,7 +63,7 @@ def main():
             zernike_amps[zernike_term] = term_val
             _update_plot()
 
-    display_gui(fig, update_zernike_amp, change_plot_type, plot_names)
+    display_gui(update_zernike_amp, change_plot_type, plot_names)
 
 
 if __name__ == '__main__':
