@@ -20,6 +20,7 @@ class NavigationToolbar(NavigationToolbar2Tk):
 #   v.grid
 # This just creates a temporary reference to the element so that it can be put
 # on the grid. This could be done in one line, but then the lines get too long.
+# Additionally, the GUI has been hardcoded to handle 24 Zernike terms.
 def display_gui(update_zernike_amp, update_plot_func, plot_names):
     # ================
     # Init the GUI
@@ -54,15 +55,15 @@ def display_gui(update_zernike_amp, update_plot_func, plot_names):
 
     zernike_inputs = []
     for term in range(*ZERNIKE_TERM_RANGE):
-        term_row = term - 12 if term > 12 else term
-        column = 4 if term > 12 else 1
+        row = term - 12 if term > 12 else term
+        offset = 3 if term > 12 else 0
         v = Label(window, text=f'{ZERNIKE_TERM_NAMES[term]}', justify=RIGHT)
-        v.grid(row=term_row, column=column, padx=(10, 0), sticky='E')
+        v.grid(row=row, column=1 + offset, padx=(10, 0), sticky='E')
         v = Label(window, text=f'Z{term}', justify=RIGHT)
-        v.grid(row=term_row, column=column + 1, sticky='E')
+        v.grid(row=row, column=2 + offset, sticky='E')
         entry_text = DoubleVar()
         v = Entry(window, width=8, textvariable=entry_text)
-        v.grid(row=term_row, column=column + 2, padx=10)
+        v.grid(row=row, column=3 + offset, padx=10)
         zernike_inputs.append(entry_text)
 
     # ==============================
@@ -107,12 +108,12 @@ def display_gui(update_zernike_amp, update_plot_func, plot_names):
 
     # Label to change the plot type
     v = Label(window, text='Plot Type:', justify=LEFT)
-    v.grid(row=15, column=1, columnspan=2, padx=10, sticky='W')
+    v.grid(row=16, column=1, columnspan=2, padx=10, sticky='W')
 
     # Option menu to change the plot type
     plot_type = StringVar()
     v = OptionMenu(window, plot_type, *plot_names, command=update_plot_func)
-    v.grid(row=16, column=1, columnspan=4, padx=10, sticky='W')
+    v.grid(row=16, column=3, columnspan=4, padx=10, sticky='WE')
 
     # ==============
     # Default values
